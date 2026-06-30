@@ -1,0 +1,1134 @@
+<!DOCTYPE html><html lang="id"><head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YuraApi</title>  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@300;400;500;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" href="https://raw.githubusercontent.com/kayzzaoshi-code/Uploader/main/file_1772878043301.jpeg" type="image/jpeg">  <style>
+    :root {
+      --bg: #f7fbff;
+      --bg-soft: #eef7ff;
+      --white: #ffffff;
+      --blue: #2563eb;
+      --blue-2: #38bdf8;
+      --blue-dark: #0f3f9f;
+      --ink: #102033;
+      --ink-2: #42566d;
+      --ink-3: #7890aa;
+      --line: rgba(37, 99, 235, .16);
+      --shadow: 0 24px 70px rgba(37, 99, 235, .14);
+      --shadow-soft: 0 14px 35px rgba(15, 63, 159, .10);
+      --radius: 28px;
+      --radius-sm: 18px;
+      --ease: cubic-bezier(.22, 1, .36, 1);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 110px;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: 'Outfit', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, .28), transparent 34%),
+        radial-gradient(circle at top right, rgba(37, 99, 235, .22), transparent 28%),
+        linear-gradient(180deg, #ffffff 0%, var(--bg) 48%, #ffffff 100%);
+      overflow-x: hidden;
+    }
+
+    body::before,
+    body::after {
+      content: "";
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(10px);
+      opacity: .45;
+      z-index: -1;
+      animation: floatGlow 10s var(--ease) infinite alternate;
+    }
+
+    body::before {
+      top: -140px;
+      left: -120px;
+      background: radial-gradient(circle, rgba(56, 189, 248, .35), transparent 68%);
+    }
+
+    body::after {
+      right: -150px;
+      bottom: 5%;
+      background: radial-gradient(circle, rgba(37, 99, 235, .25), transparent 70%);
+      animation-delay: -3s;
+    }
+
+    @keyframes floatGlow {
+      from { transform: translate3d(0, 0, 0) scale(1); }
+      to { transform: translate3d(28px, 36px, 0) scale(1.08); }
+    }
+
+    a { color: inherit; }
+
+    #overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 32, 51, .28);
+      backdrop-filter: blur(8px);
+      z-index: 80;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .35s var(--ease);
+    }
+
+    #overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 70;
+      padding: 16px;
+    }
+
+    .hdr {
+      max-width: 1120px;
+      margin: 0 auto;
+      height: 68px;
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid rgba(37, 99, 235, .14);
+      border-radius: 24px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(18px);
+      animation: dropIn .8s var(--ease) both;
+    }
+
+    @keyframes dropIn {
+      from { transform: translateY(-24px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      text-decoration: none;
+      font-weight: 800;
+      letter-spacing: -.5px;
+      font-size: 20px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      box-shadow: 0 14px 28px rgba(37, 99, 235, .25);
+      transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+    }
+
+    .brand:hover .brand-mark { transform: rotate(-8deg) scale(1.06); }
+
+    .hdr-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-btn,
+    .primary-btn,
+    .ghost-btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: transform .25s var(--ease), box-shadow .25s var(--ease), background .25s var(--ease), color .25s var(--ease), border-color .25s var(--ease);
+    }
+
+    .icon-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 15px;
+      display: grid;
+      place-items: center;
+      background: var(--bg-soft);
+      color: var(--blue);
+      border: 1px solid rgba(37, 99, 235, .13);
+    }
+
+    .icon-btn:hover,
+    .icon-btn:focus-visible {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(37, 99, 235, .16);
+      outline: none;
+    }
+
+    #sidebar {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: min(340px, calc(100vw - 32px));
+      height: calc(100vh - 32px);
+      z-index: 100;
+      border: 1px solid rgba(37, 99, 235, .16);
+      border-radius: 28px;
+      background: rgba(255, 255, 255, .86);
+      backdrop-filter: blur(22px);
+      box-shadow: var(--shadow);
+      padding: 18px;
+      transform: translateX(calc(100% + 36px)) scale(.96);
+      opacity: 0;
+      transition: transform .45s var(--ease), opacity .45s var(--ease);
+    }
+
+    #sidebar.open {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+
+    .sb-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .sb-brand {
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--ink-3);
+    }
+
+    .sb-nav {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .sb-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      text-decoration: none;
+      border-radius: 16px;
+      color: var(--ink-2);
+      border: 1px solid transparent;
+      background: transparent;
+      transition: all .3s var(--ease);
+    }
+
+    .sb-link:hover {
+      color: var(--blue);
+      background: var(--bg-soft);
+      border-color: rgba(37, 99, 235, .14);
+      transform: translateX(-4px);
+    }
+
+    main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 56px 16px 36px;
+    }
+
+    .hero {
+      min-height: 68vh;
+      display: grid;
+      align-items: center;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, .9fr);
+      gap: 34px;
+    }
+
+    .hero-copy { animation: fadeUp .75s var(--ease) both; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 12px;
+      border: 1px solid rgba(37, 99, 235, .15);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, .7);
+      color: var(--blue-dark);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: .7px;
+      text-transform: uppercase;
+      box-shadow: 0 12px 30px rgba(37, 99, 235, .08);
+    }
+
+    .pulse {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--blue-2);
+      box-shadow: 0 0 0 rgba(56, 189, 248, .55);
+      animation: pulse 1.8s infinite;
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, .55); }
+      70% { box-shadow: 0 0 0 13px rgba(56, 189, 248, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
+    }
+
+    h1 {
+      margin: 22px 0 16px;
+      font-size: clamp(52px, 10vw, 112px);
+      line-height: .9;
+      letter-spacing: -5px;
+      color: var(--ink);
+    }
+
+    .gradient-text {
+      display: inline-block;
+      color: transparent;
+      background: linear-gradient(120deg, var(--blue-dark), var(--blue), var(--blue-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-size: 180% 180%;
+      animation: gradientMove 5s var(--ease) infinite alternate;
+    }
+
+    @keyframes gradientMove {
+      from { background-position: 0% 50%; }
+      to { background-position: 100% 50%; }
+    }
+
+    .hero-text {
+      max-width: 590px;
+      margin: 0 0 28px;
+      color: var(--ink-2);
+      font-size: clamp(16px, 2vw, 19px);
+      line-height: 1.8;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .ghost-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 0 18px;
+      border-radius: 16px;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .primary-btn {
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      box-shadow: 0 18px 35px rgba(37, 99, 235, .24);
+    }
+
+    .ghost-btn {
+      color: var(--blue);
+      background: rgba(255, 255, 255, .72);
+      border: 1px solid rgba(37, 99, 235, .15);
+    }
+
+    .primary-btn:hover,
+    .ghost-btn:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 24px 42px rgba(37, 99, 235, .20);
+    }
+
+    .hero-panel {
+      position: relative;
+      min-height: 440px;
+      animation: fadeScale .9s var(--ease) .12s both;
+    }
+
+    .glass-card {
+      position: absolute;
+      inset: 28px 0 auto auto;
+      width: min(100%, 430px);
+      padding: 26px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(37, 99, 235, .16);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+      transition: transform .45s var(--ease), box-shadow .45s var(--ease);
+    }
+
+    .glass-card:hover {
+      transform: translateY(-8px) rotate(.35deg);
+      box-shadow: 0 30px 80px rgba(37, 99, 235, .18);
+    }
+
+    .glass-card::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      background: linear-gradient(120deg, transparent, rgba(56, 189, 248, .24), transparent);
+      transform: translateX(-100%);
+      animation: shine 5s var(--ease) infinite;
+    }
+
+    @keyframes shine {
+      0%, 45% { transform: translateX(-100%); }
+      75%, 100% { transform: translateX(100%); }
+    }
+
+    .panel-inner { position: relative; z-index: 1; }
+
+    .api-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 11px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      color: var(--blue-dark);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      margin-bottom: 24px;
+    }
+
+    .terminal {
+      border-radius: 20px;
+      background: #07162f;
+      color: #dbeafe;
+      overflow: hidden;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .terminal-top {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 0 14px;
+      background: rgba(255,255,255,.06);
+    }
+
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,.35); }
+
+    .terminal pre {
+      margin: 0;
+      padding: 18px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+      line-height: 1.8;
+      overflow-x: auto;
+    }
+
+    .code-blue { color: #7dd3fc; }
+    .code-green { color: #bbf7d0; }
+    .code-yellow { color: #fde68a; }
+
+    .mini-orb {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 36px;
+      background: linear-gradient(135deg, rgba(37, 99, 235, .95), rgba(56, 189, 248, .95));
+      bottom: 22px;
+      left: 10px;
+      box-shadow: 0 25px 55px rgba(37, 99, 235, .28);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 38px;
+      animation: floatCard 4s var(--ease) infinite alternate;
+    }
+
+    @keyframes floatCard {
+      from { transform: translate3d(0, 0, 0) rotate(-7deg); }
+      to { transform: translate3d(18px, -18px, 0) rotate(4deg); }
+    }
+
+    .section-block {
+      padding: 44px 0 14px;
+    }
+
+    .section-heading {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0 18px;
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--ink-3);
+    }
+
+    .section-heading::after {
+      content: "";
+      height: 1px;
+      flex: 1;
+      background: var(--line);
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .nav-card,
+    .price-card,
+    .contact-card {
+      position: relative;
+      padding: 22px;
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .78);
+      border: 1px solid rgba(37, 99, 235, .14);
+      text-decoration: none;
+      box-shadow: 0 15px 35px rgba(37, 99, 235, .08);
+      overflow: hidden;
+      transition: transform .38s var(--ease), box-shadow .38s var(--ease), border-color .38s var(--ease), background .38s var(--ease);
+    }
+
+    .nav-card {
+      min-height: 210px;
+      transform: translateY(18px);
+      opacity: 0;
+      animation: fadeUp .75s var(--ease) forwards;
+    }
+
+    .nav-card:nth-child(2) { animation-delay: .08s; }
+    .nav-card:nth-child(3) { animation-delay: .16s; }
+
+    .nav-card::after,
+    .price-card::after,
+    .contact-card::after {
+      content: "";
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      right: -70px;
+      bottom: -70px;
+      background: radial-gradient(circle, rgba(56, 189, 248, .28), transparent 70%);
+      transition: transform .45s var(--ease), opacity .45s var(--ease);
+    }
+
+    .nav-card:hover,
+    .price-card:hover,
+    .contact-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(37, 99, 235, .35);
+      box-shadow: 0 28px 65px rgba(37, 99, 235, .16);
+      background: white;
+    }
+
+    .nav-card:hover::after,
+    .price-card:hover::after,
+    .contact-card:hover::after { transform: scale(1.5); opacity: .9; }
+
+    .nav-card-icon,
+    .contact-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      color: white;
+      background: linear-gradient(135deg, var(--blue), var(--blue-2));
+      box-shadow: 0 14px 32px rgba(37, 99, 235, .22);
+      margin-bottom: 22px;
+      transition: transform .35s var(--ease);
+    }
+
+    .nav-card:hover .nav-card-icon,
+    .contact-card:hover .contact-icon { transform: rotate(-8deg) scale(1.08); }
+
+    .nav-card h3,
+    .price-card h3,
+    .contact-card h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+      letter-spacing: -.4px;
+    }
+
+    .nav-card p,
+    .price-card p,
+    .contact-card p {
+      margin: 0;
+      color: var(--ink-2);
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin: 18px 0 0;
+    }
+
+    .stat {
+      padding: 18px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.72);
+      border: 1px solid rgba(37, 99, 235, .13);
+      box-shadow: 0 14px 34px rgba(37, 99, 235, .08);
+      transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+    }
+
+    .stat:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 46px rgba(37, 99, 235, .13);
+    }
+
+    .stat strong {
+      display: block;
+      color: var(--blue);
+      font-size: 28px;
+      letter-spacing: -1px;
+    }
+
+    .stat span {
+      color: var(--ink-3);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .docs-box {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .doc-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .doc-item {
+      padding: 18px;
+      border-radius: 20px;
+      background: rgba(255,255,255,.76);
+      border: 1px solid rgba(37, 99, 235, .13);
+      box-shadow: 0 14px 34px rgba(37, 99, 235, .08);
+    }
+
+    .doc-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--blue-dark);
+    }
+
+    .doc-item code {
+      display: inline-block;
+      margin-top: 8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: #07162f;
+      color: #dbeafe;
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+    }
+
+    .pricing-grid,
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .price {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+      margin: 20px 0;
+      color: var(--blue);
+    }
+
+    .price strong {
+      font-size: 38px;
+      letter-spacing: -1.5px;
+    }
+
+    .price span { color: var(--ink-3); }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 22px;
+      display: grid;
+      gap: 11px;
+      color: var(--ink-2);
+    }
+
+    .feature-list li {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+    }
+
+    .feature-list i { color: var(--blue); }
+
+    .popular {
+      border-color: rgba(37, 99, 235, .38);
+      transform: translateY(-8px);
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: var(--bg-soft);
+      color: var(--blue-dark);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      margin-bottom: 14px;
+    }
+
+    .footer-commerce {
+      margin-top: 58px;
+      padding: 34px 28px 20px;
+      border-radius: 34px 34px 0 0;
+      background: #07162f;
+      color: #dbeafe;
+      box-shadow: 0 -18px 60px rgba(37, 99, 235, .16);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .footer-commerce::before {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      right: -80px;
+      top: -90px;
+      background: radial-gradient(circle, rgba(56, 189, 248, .24), transparent 68%);
+    }
+
+    .footer-top {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 1.2fr repeat(3, 1fr);
+      gap: 28px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid rgba(255,255,255,.12);
+    }
+
+    .footer-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+    .footer-brand .brand-mark {
+      width: 40px;
+      height: 40px;
+      box-shadow: none;
+    }
+
+    .footer-desc {
+      max-width: 330px;
+      margin: 0 0 18px;
+      color: rgba(219, 234, 254, .72);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .socials {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .socials a {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      text-decoration: none;
+      color: #dbeafe;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      transition: transform .25s var(--ease), background .25s var(--ease);
+    }
+
+    .socials a:hover {
+      transform: translateY(-4px);
+      background: rgba(56, 189, 248, .22);
+    }
+
+    .footer-col h4 {
+      margin: 0 0 14px;
+      color: white;
+      font-size: 15px;
+    }
+
+    .footer-col a,
+    .footer-col span {
+      display: block;
+      text-decoration: none;
+      color: rgba(219, 234, 254, .70);
+      margin-bottom: 10px;
+      font-size: 14px;
+      transition: color .25s var(--ease), transform .25s var(--ease);
+    }
+
+    .footer-col a:hover {
+      color: white;
+      transform: translateX(4px);
+    }
+
+    .payment-icons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .payment-icons span {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.11);
+      color: rgba(219, 234, 254, .86);
+      font-family: 'Geist Mono', monospace;
+      font-size: 11px;
+      margin: 0;
+    }
+
+    .footer-bottom {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      padding-top: 18px;
+      color: rgba(219, 234, 254, .62);
+      font-family: 'Geist Mono', monospace;
+      font-size: 12px;
+    }
+
+    @keyframes fadeUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeScale {
+      from { transform: scale(.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 900px) {
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .docs-box { grid-template-columns: 1fr; }
+      .pricing-grid, .contact-grid { grid-template-columns: 1fr; }
+      .popular { transform: none; }
+    }
+
+    @media (max-width: 840px) {
+      main { padding-top: 28px; }
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-panel { min-height: 390px; }
+      .glass-card { inset: 0 0 auto 0; width: 100%; }
+      .mini-orb { bottom: 0; left: 18px; width: 94px; height: 94px; border-radius: 28px; font-size: 30px; }
+      .card-grid, .stats { grid-template-columns: 1fr; }
+      h1 { letter-spacing: -3px; }
+    }
+
+    @media (max-width: 560px) {
+      .ghost-btn.header-cta { display: none; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-commerce { padding-inline: 20px; }
+      h1 { font-size: clamp(48px, 15vw, 76px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style></head>
+<body>
+  <div id="overlay"></div>  <aside id="sidebar" aria-label="Navigation Sidebar">
+    <div class="sb-head">
+      <span class="sb-brand">Navigation</span>
+      <button class="icon-btn" id="sidebarClose" aria-label="Tutup menu">
+        <span class="material-icons">close</span>
+      </button>
+    </div><nav class="sb-nav">
+  <a href="#home" class="sb-link"><span class="material-icons">home</span>Home</a>
+  <a href="/docs" class="sb-link"><span class="material-icons">api</span>Documentation</a>
+  <a href="#contact" class="sb-link"><span class="material-icons">support_agent</span>Contact</a>
+  <a href="#channel" class="sb-link"><span class="material-icons">campaign</span>Channel</a>
+  <a href="#pricing" class="sb-link"><span class="material-icons">sell</span>Pricing</a>
+</nav>
+
+  </aside>  <header>
+    <div class="hdr">
+      <a href="#home" class="brand" aria-label="YuraApi Home">
+        <span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>
+        <span>YuraApi</span>
+      </a><div class="hdr-actions">
+    <a class="ghost-btn header-cta" href="#pricing"><span class="material-icons">sell</span>Pricing</a>
+    <button class="icon-btn" id="sidebarToggle" aria-label="Buka menu">
+      <span class="material-icons">menu</span>
+    </button>
+  </div>
+</div>
+
+  </header>  <main>
+    <section class="hero" id="home">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="pulse"></span> Welcome To Yura REST API</div>
+        <h1><span class="gradient-text">YuraApi</span><br>Modern API</h1>
+        <p class="hero-text">
+          Platform REST API gratis, responsif, dan modern, cocok untuk pengalaman pengguna yang ringan, elegan, dan nyaman untuk semua pengguna.
+        </p>
+        <div class="hero-actions">
+          <a href="/docs" class="primary-btn"><span class="material-icons">rocket_launch</span>Mulai Pakai API</a>
+          <a href="#contact" class="ghost-btn"><span class="material-icons">support_agent</span>Hubungi Kami</a>
+        </div>
+      </div><div class="hero-panel" aria-hidden="true">
+    <div class="glass-card">
+      <div class="panel-inner">
+        <div class="api-badge"><span class="material-icons" style="font-size:16px">verified</span> API Ready</div>
+        <div class="terminal">
+          <div class="terminal-top">
+            <span class="dot"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <pre><span class="code-blue">GET</span> /api/status
+
+{ <span class="code-yellow">"name"</span>: <span class="code-green">"YuraApi"</span>, <span class="code-yellow">"status"</span>: <span class="code-green">"online"</span>, <span class="code-yellow">"theme"</span>: <span class="code-green">"blue-white"</span> }</pre> </div> </div> </div> <div class="mini-orb"><i class="fa-solid fa-code"></i></div> </div> </section>
+
+<section id="features" class="section-block">
+  <div class="section-heading"><i class="fa-solid fa-sparkles" style="color:var(--blue)"></i> Menu Utama</div>
+  <div class="card-grid">
+    <a href="/docs" class="nav-card">
+      <div class="nav-card-icon"><i class="fa-solid fa-code"></i></div>
+      <h3>Documentation</h3>
+      <p>Jelajahi endpoint, parameter, response, dan contoh penggunaan API di halaman docs seperti sebelumnya.</p>
+    </a>
+
+    <a href="#contact" class="nav-card">
+      <div class="nav-card-icon"><i class="fa-solid fa-headset"></i></div>
+      <h3>Contact</h3>
+      <p>Hubungi admin untuk bantuan integrasi, request endpoint, atau informasi kerja sama.</p>
+    </a>
+
+    <a href="#pricing" class="nav-card">
+      <div class="nav-card-icon"><i class="fa-solid fa-tags"></i></div>
+      <h3>Pricing</h3>
+      <p>Pilih paket API yang sesuai dengan kebutuhan project kecil sampai layanan production.</p>
+    </a>
+  </div>
+</section>
+
+<section class="stats" aria-label="YuraApi highlights">
+  <div class="stat">
+    <strong>Modern</strong>
+    <span>Tampilan Modern</span>
+  </div>
+  <div class="stat">
+    <strong>Free</strong>
+    <span>Gratis untuk semua pengguna</span>
+  </div>
+  <div class="stat">
+    <strong>Fast</strong>
+    <span>Responsive Layout</span>
+  </div>
+</section>
+
+<section id="contact" class="section-block">
+  <div class="section-heading"><i class="fa-solid fa-headset" style="color:var(--blue)"></i> Contact</div>
+  <div class="contact-grid">
+    <a href="https://wa.me/6281559556419" target="_blank" class="contact-card">
+      <div class="contact-icon"><i class="fa-brands fa-whatsapp"></i></div>
+      <h3>WhatsApp</h3>
+      <p>Chat langsung dengan admin untuk bantuan, request API, atau pertanyaan layanan.</p>
+    </a>
+    <a href="mailto:support@yuraapi.local" class="contact-card">
+      <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+      <h3>Email Support</h3>
+      <p>Kirim pesan detail untuk kebutuhan integrasi, bug report, atau kerja sama.</p>
+    </a>
+    <a href="#channel" class="contact-card">
+      <div class="contact-icon"><i class="fa-solid fa-bullhorn"></i></div>
+      <h3>Update Channel</h3>
+      <p>Ikuti channel resmi agar tidak ketinggalan update endpoint dan maintenance.</p>
+    </a>
+  </div>
+</section>
+
+<section id="channel" class="section-block">
+  <div class="section-heading"><i class="fa-solid fa-tower-broadcast" style="color:var(--blue)"></i> Channel</div>
+  <div class="nav-card" style="min-height:auto; opacity:1; transform:none;">
+    <div class="nav-card-icon"><i class="fa-brands fa-whatsapp"></i></div>
+    <h3>YuraApi Official Channel</h3>
+    <p>Dapatkan info update endpoint, fitur baru, maintenance, dan pengumuman penting langsung dari channel resmi.</p>
+    <div style="margin-top:20px;">
+      <a href="https://whatsapp.com/channel/0029Vb2cITjGufIu0CVNUj3m" target="_blank" class="primary-btn">
+        <span class="material-icons">campaign</span>Join Channel
+      </a>
+    </div>
+  </div>
+</section>
+
+<section id="pricing" class="section-block">
+  <div class="section-heading"><i class="fa-solid fa-tags" style="color:var(--blue)"></i> Pricing</div>
+  <div class="pricing-grid" style="grid-template-columns: minmax(0, 420px); justify-content: center;">
+    <div class="price-card popular">
+      <span class="tag">Free Access</span>
+      <h3>Free</h3>
+      <p>Cocok untuk testing, belajar integrasi, dan project kecil tanpa biaya.</p>
+      <div class="price"><strong>Free</strong><span>/ selamanya</span></div>
+      <ul class="feature-list">
+        <li><i class="fa-solid fa-check"></i> Akses endpoint dasar</li>
+        <li><i class="fa-solid fa-check"></i> Cocok untuk testing API</li>
+        <li><i class="fa-solid fa-check"></i> Dokumentasi mudah dipahami</li>
+        <li><i class="fa-solid fa-check"></i> Support via WhatsApp</li>
+      </ul>
+      <a href="/docs" class="primary-btn">Mulai Gratis</a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer-commerce">
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand">
+        <span class="brand-mark"><i class="fa-solid fa-bolt"></i></span>
+        <span>YuraApi</span>
+      </div>
+      <p class="footer-desc">
+        Modern API hub untuk developer yang butuh layanan cepat, ringan, dan mudah diintegrasikan ke berbagai project digital.
+      </p>
+      <div class="socials">
+        <a href="https://wa.me/6283167295612" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="https://whatsapp.com/channel/0029VbCEBa77j6g2KN3NYB3A" target="_blank" aria-label="Channel"><i class="fa-solid fa-bullhorn"></i></a>
+        <a href="#home" aria-label="Website"><i class="fa-solid fa-globe"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4>Shop API</h4>
+      <a href="#pricing">Pricing</a>
+      <a href="/docs">Documentation</a>
+      <a href="#contact">Request Endpoint</a>
+      <a href="#channel">Update Channel</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Customer Care</h4>
+      <a href="#contact">Contact Support</a>
+      <a href="/docs">Cara Integrasi</a>
+      <a href="#pricing">Paket API</a>
+      <a href="#home">Kembali ke Atas</a>
+    </div>
+
+    <div class="footer-col">
+      <h4>Payment</h4>
+      <span>Transaksi aman dan cepat.</span>
+      <div class="payment-icons">
+        <span>QRIS</span>
+        <span>DANA</span>
+        <span>OVO</span>
+        <span>GOPAY</span>
+        <span>BANK</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© <span id="yr"></span> YuraApi — All Rights Reserved</span>
+    <span>Made for fast, clean, and smooth API experience.</span>
+  </div>
+</footer>
+
+  </main>  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarClose = document.getElementById('sidebarClose');
+
+    function openSidebar() {
+      sidebar.classList.add('open');
+      overlay.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    function smoothMoveTo(targetId) {
+      const target = document.querySelector(targetId);
+      if (!target) return;
+
+      closeSidebar();
+
+      setTimeout(() => {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }, 120);
+    }
+
+    sidebarToggle.addEventListener('click', openSidebar);
+    sidebarClose.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(function(link) {
+      link.addEventListener('click', function(e) {
+        const targetId = this.getAttribute('href');
+        if (targetId.length > 1) {
+          e.preventDefault();
+          smoothMoveTo(targetId);
+        }
+      });
+    });
+
+    document.getElementById('yr').textContent = new Date().getFullYear();
+  </script></body>
+</html>
