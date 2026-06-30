@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>YuraApi | Documents</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        sans: ['Quicksand', 'sans-serif']
+                    },
+                    colors: {
+                        'fmn-blue': '#2563EB',
+                        'fmn-dark': '#1D4ED8',
+                        'fmn-purple': '#60A5FA',
+                        'fmn-bg': '#F8FBFF'
+                    },
+                    boxShadow: {
+                        soft: '0 6px 18px rgba(37, 99, 235, 0.08)',
+                        neon: '0 8px 20px rgba(37, 99, 235, 0.12)'
+                    },
+                    animation: {
+                        blink: 'blink 1s step-end infinite',
+                        fadeIn: 'fadeIn .25s ease-out forwards',
+                        softUp: 'softUp .25s ease-out forwards'
+                    },
+                    keyframes: {
+                        blink: {
+                            '0%, 100%': { opacity: '1' },
+                            '50%': { opacity: '0' }
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' }
+                        },
+                        softUp: {
+                            '0%': {
+                                opacity: '0',
+                                transform: 'translateY(7px)'
+                            },
+                            '100%': {
+                                opacity: '1',
+                                transform: 'translateY(0)'
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            min-height: 100%;
+            overflow-x: hidden;
+            background: #F8FBFF;
+        }
+
+        body {
+            font-size: 13px;
+        }
+
+        #fixed-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -50;
+            background: #F8FBFF;
+            background-image:
+                radial-gradient(circle at top left, rgba(37,99,235,.10), transparent 34%),
+                radial-gradient(circle at bottom right, rgba(96,165,250,.15), transparent 38%);
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #2563EB;
+            border-radius: 999px;
+        }
+
+        .json-key {
+            color: #1D4ED8;
+            font-weight: 700;
+        }
+
+        .json-string {
+            color: #047857;
+        }
+
+        .json-number {
+            color: #2563EB;
+            font-weight: 700;
+        }
+
+        .json-boolean {
+            color: #0284C7;
+            font-style: italic;
+        }
+
+        .json-null {
+            color: #64748B;
+        }
+
+        .status-indicator {
+            width: 7px;
+            height: 7px;
+            display: inline-block;
+            border-radius: 999px;
+        }
+
+        .status-waiting {
+            background: #2563EB;
+            box-shadow: 0 0 8px #2563EB;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-success {
+            background: #10b981;
+            box-shadow: 0 0 8px #10b981;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-error {
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+            animation: blink 1.5s infinite;
+        }
+
+        .sidebar-category-btn.active {
+            background: #2563EB !important;
+            color: #fff !important;
+            border-color: #2563EB !important;
+        }
+
+        .soft-btn {
+            --button-raise-level: 4px;
+            --press-inset: 2px;
+            --radius: 9px;
+            position: relative;
+            border: none;
+            background: transparent;
+            padding: 0;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .soft-btn__wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .soft-btn__wrapper:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            height: calc(100% - var(--button-raise-level));
+            background: var(--side-color);
+            border-radius: var(--radius);
+            z-index: 1;
+        }
+
+        .soft-btn__content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            height: calc(100% - var(--button-raise-level));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius);
+            background: var(--surface-color);
+            color: var(--text-color);
+            border: var(--border-width) solid var(--border-color);
+            transition: transform .14s ease-out;
+        }
+
+        .soft-btn__inner {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .soft-btn--active .soft-btn__content {
+            transform: translateY(var(--press-inset));
+        }
+
+        .variant-lavender {
+            --surface-color: #fff;
+            --side-color: #DBEAFE;
+            --text-color: #1D4ED8;
+            --border-color: #2563EB;
+            --border-width: 1.5px;
+        }
+
+        .copy-mini-btn {
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 0 6px;
+            border-radius: 8px;
+            border: 1px solid #DBEAFE;
+            background: #fff;
+            color: #1D4ED8;
+            font-size: 9px;
+            font-weight: 700;
+        }
+
+        .request-url-box {
+            margin: 8px 8px 0;
+            padding: 7px;
+            border-radius: 9px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+        }
+
+        .request-url-box .label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 3px;
+            color: #64748B;
+            font-size: 7px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+        }
+
+        .request-url-box code {
+            display: block;
+            max-height: 48px;
+            overflow-y: auto;
+            word-break: break-all;
+            color: #334155;
+            font-size: 8px;
+            line-height: 1.45;
+        }
+
+        .response-output-box {
+            margin: 8px;
+            padding: 8px;
+            min-height: 58px;
+            max-height: 190px;
+            overflow-y: auto;
+            border-radius: 9px;
+            background: #fff;
+            border: 1px solid #E2E8F0;
+        }
+
+        @media (max-width: 768px) {
+            nav .max-w-7xl {
+                height: 50px;
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            #nav-title {
+                font-size: 15px;
+                line-height: 1;
+            }
+
+            #nav-title + span {
+                font-size: 7px;
+                letter-spacing: .11em;
+            }
+
+            nav button {
+                width: 32px !important;
+                height: 32px !important;
+                font-size: 12px;
+            }
+
+            main {
+                display: block !important;
+                padding: 10px 8px 22px !important;
+                overflow: visible;
+            }
+
+            main > aside {
+                position: relative !important;
+                top: auto !important;
+                margin-bottom: 10px;
+            }
+
+            #search-input {
+                height: 40px;
+                font-size: 12px;
+                padding-left: 36px;
+                padding-right: 12px;
+                border-radius: 14px;
+            }
+
+            .search-icon-mobile {
+                left: 12px !important;
+                top: 12px !important;
+                font-size: 13px;
+            }
+
+            #api-container {
+                display: flex;
+                flex-direction: column;
+                gap: 9px;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+
+            .api-section {
+                margin-bottom: 2px;
+                scroll-margin-top: 62px;
+            }
+
+            .api-section-grid {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 9px !important;
+                margin-bottom: 10px !important;
+            }
+
+            .category-header-main {
+                display: none !important;
+            }
+
+            .api-card-wrapper {
+                border-radius: 12px !important;
+                box-shadow: 0 3px 12px rgba(37,99,235,.07) !important;
+            }
+
+            .api-card-head {
+                padding: 10px !important;
+                min-height: 62px;
+            }
+
+            .method-badge-mobile {
+                width: 45px !important;
+                padding: 5px 5px !important;
+                font-size: 8.5px !important;
+                border-radius: 8px !important;
+            }
+
+            .api-card-wrapper code {
+                font-size: 12px !important;
+                line-height: 1.25;
+            }
+
+            .api-name-text {
+                font-size: 9px !important;
+                line-height: 1.25;
+            }
+
+            .params-box-mobile {
+                padding: 9px !important;
+                gap: 7px !important;
+            }
+
+            .api-card-wrapper label {
+                font-size: 8px !important;
+                margin-bottom: 3px;
+            }
+
+            .api-card-wrapper input {
+                padding: 8px !important;
+                font-size: 10.5px !important;
+                border-radius: 8px !important;
+            }
+
+            .status-guide-wrap {
+                display: none !important;
+            }
+
+            .action-row-mobile {
+                padding: 9px !important;
+                gap: 7px !important;
+            }
+
+            .soft-btn {
+                height: 35px !important;
+            }
+
+            .soft-btn__inner {
+                font-size: 9.5px !important;
+                letter-spacing: .05em;
+            }
+
+            .copy-full-url-btn {
+                width: 35px !important;
+                height: 35px !important;
+                padding: 0 !important;
+                border-radius: 9px !important;
+                font-size: 11px;
+                flex-shrink: 0;
+            }
+
+            .response-area {
+                margin: 0 8px 8px !important;
+                max-width: calc(100% - 16px) !important;
+                border-radius: 12px !important;
+            }
+
+            .response-toolbar {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 8px;
+                padding: 8px;
+                border-bottom: 1px solid #E2E8F0;
+                background: #fff;
+            }
+
+            .response-meta {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 4px 6px;
+                border-radius: 999px;
+                background: #F8FAFC;
+                border: 1px solid #E2E8F0;
+            }
+
+            .response-meta span {
+                font-size: 8px !important;
+            }
+
+            .response-action-grid {
+                padding: 8px 8px 0 !important;
+                gap: 5px !important;
+            }
+
+            #sidebar-menu {
+                width: 260px;
+            }
+
+            #sidebar-menu .p-5 {
+                padding: 14px;
+            }
+
+            #sidebar-menu h2 {
+                font-size: 16px;
+            }
+
+            #sidebar-menu a {
+                padding: 9px 10px;
+                border-radius: 12px;
+                font-size: 12px;
+            }
+
+            .sidebar-category-btn {
+                padding: 9px 10px !important;
+                border-radius: 12px !important;
+                font-size: 11px !important;
+            }
+            .api-section-grid {
+    align-items: start;
+}
+
+.api-card-wrapper {
+    position: relative;
+    overflow: hidden;
+}
+
+.api-card-wrapper:hover {
+    transform: translateY(-2px);
+}
+
+.api-section {
+    scroll-margin-top: 90px;
+}
+
+body.sidebar-open {
+    overflow: hidden;
+}
+
+@media (min-width: 1024px) {
+    #api-container {
+        gap: 14px;
+    }
+
+    .api-section-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    main {
+        padding-top: 70px !important;
+    }
+
+    .api-card-wrapper {
+        border-radius: 14px;
+    }
+
+    .api-section-grid {
+        gap: 10px !important;
+    }
+        }
+    </style>
+</head>
+
+<body class="text-slate-700 min-h-screen flex flex-col font-sans selection:bg-fmn-blue selection:text-white">
+    <div id="fixed-bg"></div>
+
+    <!-- FIX: navbar tidak sticky lagi, jadi tidak ikut saat scroll -->
+    <nav class="fixed top-0 left-0 right-0 border-b border-blue-100 bg-white/95 backdrop-blur-md z-[70] shadow-sm w-full">
+    <div class="max-w-7xl mx-auto px-4 h-16 flex items-center gap-4 justify-between">
+        <div class="flex items-center gap-3 shrink-0">
+            <button onclick="openSidebar()" class="w-10 h-10 bg-fmn-blue text-white flex items-center justify-center rounded-full hover:bg-fmn-dark hover:scale-105 transition-all shadow-md cursor-pointer border border-fmn-dark/20">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div>
+                <h1 id="nav-title" class="font-bold text-xl tracking-tight text-fmn-dark uppercase">YuraApi</h1>
+                <span class="text-[10px] font-bold text-fmn-purple tracking-widest">API DOCUMENTATION</span>
+            </div>
+        </div>
+
+        <div class="hidden md:flex flex-1 max-w-xl mx-auto h-8 items-center justify-center mx-4">
+            <span id="running-text" class="text-fmn-dark text-xs font-mono font-bold uppercase tracking-widest bg-blue-50 border border-blue-100 px-4 py-2 rounded-full">
+                READY TO USE
+            </span>
+        </div>
+
+        <div class="w-10 h-10 hidden md:block"></div>
+    </div>
+</nav>
+
+    <div id="sidebar-overlay" onclick="closeSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-[80] hidden animate-fadeIn"></div>
+
+    <aside id="sidebar-menu" class="fixed top-0 left-0 h-full w-[290px] max-w-[85vw] bg-white z-[90] shadow-2xl border-r border-blue-100 -translate-x-full transition-transform duration-300 ease-out">
+        <div class="p-5 border-b border-blue-100 flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-fmn-dark">YuraApi</h2>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Navigation</p>
+            </div>
+
+            <button onclick="closeSidebar()" class="w-9 h-9 rounded-full bg-blue-50 text-fmn-dark hover:bg-fmn-blue hover:text-white transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="p-4 space-y-3">
+            <a href="/" class="flex items-center gap-3 bg-fmn-bg border border-blue-100 rounded-2xl px-4 py-3 font-bold text-fmn-dark hover:bg-fmn-blue hover:text-white transition-all">
+                <i class="fa-solid fa-house"></i>
+                <span>Home</span>
+            </a>
+
+            <div>
+                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest px-2 mb-2">Categories</p>
+                <div id="sidebar-categories" class="space-y-2"></div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-grow max-w-7xl mx-auto w-full px-3 py-4 grid lg:grid-cols-12 gap-5 items-start relative z-10 overflow-hidden">
+        <aside class="lg:col-span-4 lg:sticky lg:top-24 flex flex-col gap-6 h-fit z-40 w-full max-w-full">
+            <div class="relative group">
+                <input type="text" id="search-input" placeholder="Search Feature..." class="w-full h-11 border border-blue-100 px-4 pl-10 font-bold text-xs sm:text-sm text-slate-600 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-fmn-blue/30 focus:border-fmn-dark transition-all placeholder:text-slate-400 bg-white/95 backdrop-blur hover:shadow-neon hover:border-fmn-blue">
+                <i class="fa-solid fa-magnifying-glass search-icon-mobile absolute left-4 top-3.5 text-fmn-blue"></i>
+            </div>
+        </aside>
+
+        <section class="lg:col-span-8 min-h-[50vh] w-full max-w-full">
+            <div id="api-container" class="space-y-3 opacity-0 translate-y-4 transition-all duration-500 w-full"></div>
+
+            <div id="no-results" class="hidden flex-col items-center justify-center py-20 text-center opacity-70">
+                <i class="fa-solid fa-box-open text-5xl mb-3 text-fmn-blue"></i>
+                <p class="font-bold text-lg text-slate-400">No Data Found</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="custom-toast" class="fixed bottom-6 right-6 z-[100] transform translate-y-32 opacity-0 transition-all duration-300">
+        <div class="bg-white text-slate-700 px-5 py-3 font-bold text-sm shadow-xl rounded-xl flex items-center gap-3 border border-blue-100">
+            <div class="w-6 h-6 bg-fmn-blue text-white rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <span id="toast-message">SUCCESS</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', init);
+
+        let globalConfig = null;
+        let toastTimeout;
+        let activeCategoryId = 'all';
+
+        function openSidebar() {
+            document.getElementById('sidebar-overlay')?.classList.remove('hidden');
+            document.getElementById('sidebar-menu')?.classList.remove('-translate-x-full');
+        }
+
+        function closeSidebar() {
+            document.getElementById('sidebar-overlay')?.classList.add('hidden');
+            document.getElementById('sidebar-menu')?.classList.add('-translate-x-full');
+        }
+
+        async function init() {
+            try {
+                const response = await fetch('/config');
+
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil /config: ' + response.status);
+                }
+
+                globalConfig = await response.json();
+
+                setUi(globalConfig);
+                loadEnd(globalConfig.tags || {});
+                setSearch();
+                loadReminder();
+                showReadyState();
+            } catch (err) {
+                showConfigError(err.message || 'Gagal memuat data API.');
+            }
+        }
+
+        function showReadyState() {
+            const container = document.getElementById('api-container');
+
+            if (!container) return;
+
+            container.classList.remove('opacity-0', 'translate-y-4');
+            container.classList.add('animate-softUp');
+        }
+
+        function showConfigError(message) {
+            const container = document.getElementById('api-container');
+
+            if (!container) return;
+
+            container.classList.remove('opacity-0', 'translate-y-4');
+            container.innerHTML = `
+                <div class="bg-white border border-red-100 rounded-2xl p-4 shadow-soft text-red-600 font-bold text-xs leading-relaxed">
+                    <i class="fa-solid fa-triangle-exclamation mr-2"></i>${escapeHtml(message)}
+                    <p class="text-slate-500 mt-2 font-semibold">Cek route <code>/config</code> dan pastikan data <code>tags</code> tidak kosong.</p>
+                </div>`;
+        }
+
+        async function loadReminder() {
+            try {
+                const req = await fetch('../src/reminder.json');
+                const data = await req.json();
+
+                if (data?.message) {
+                    const runningText = document.getElementById('running-text');
+                    if (runningText) runningText.innerText = 'READY TO USE';
+                }
+            } catch (e) {}
+        }
+
+        function setUi(config) {
+            const s = config.settings || {};
+            const navTitle = document.getElementById('nav-title');
+
+            if (navTitle) {
+                navTitle.innerText = 'YuraApi';
+            }
+
+            if (s.favicon) {
+                let link = document.querySelector("link[rel~='icon']") || document.createElement('link');
+
+                link.rel = 'icon';
+                link.href = s.favicon;
+
+                document.head.appendChild(link);
+            }
+        }
+
+        function escapeHtml(value) {
+            return String(value ?? '')
+                .split('&').join('&amp;')
+                .split('<').join('&lt;')
+                .split('>').join('&gt;')
+                .split('"').join('&quot;')
+                .split("'").join('&#039;');
+        }
+
+        function getLastPathName(value) {
+            let text = String(value || '').trim();
+
+            text = text.split('?')[0];
+            text = text.replace(/^\/+|\/+$/g, '');
+
+            const parts = text.split('/').filter(Boolean);
+
+            let last = parts.length ? parts[parts.length - 1] : text;
+
+            last = last
+                .replace(/^api$/i, '')
+                .replace(/[-_]+/g, ' ')
+                .trim();
+
+            if (!last) return 'feature';
+
+            return last.toLowerCase();
+        }
+
+        function getDisplayFeature(value) {
+            return getLastPathName(value);
+        }
+
+        function getExampleValue(param) {
+            const name = typeof param === 'string' ? param : (param?.name || '');
+            const type = typeof param === 'string' ? '' : String(param?.type || param?.input || param?.format || '').toLowerCase();
+            const key = String(name || '').toLowerCase();
+            const combined = key + ' ' + type;
+
+            const isUrl = [
+                'url',
+                'link',
+                'bg',
+                'background',
+                'image',
+                'img',
+                'photo',
+                'picture',
+                'avatar',
+                'thumbnail',
+                'thumb',
+                'logo',
+                'banner',
+                'cover',
+                'media',
+                'file'
+            ].some(x => combined.includes(x));
+
+            if (isUrl) return 'https://example.com/image.jpg';
+            if (combined.includes('video')) return 'https://example.com/video.mp4';
+            if (combined.includes('audio') || combined.includes('sound') || combined.includes('music')) return 'https://example.com/audio.mp3';
+            if (combined.includes('email')) return 'user@example.com';
+            if (combined.includes('phone') || combined.includes('wa') || combined.includes('whatsapp')) return '6281234567890';
+            if (combined.includes('number') || combined.includes('count') || combined.includes('amount') || combined.includes('page')) return '1';
+            if (combined.includes('limit')) return '10';
+            if (combined.includes('boolean') || combined.includes('bool')) return 'true';
+            if (combined.includes('id')) return '1';
+            if (combined.includes('apikey') || combined.includes('api_key') || combined.includes('key')) return 'demo-key';
+
+            const isText = [
+                'text',
+                'prompt',
+                'query',
+                'message',
+                'caption',
+                'title',
+                'desc',
+                'description',
+                'name',
+                'username'
+            ].some(x => combined.includes(x));
+
+            if (isText || key === 'q') return 'Hello YuraApi';
+
+            return 'example';
+        }
+
+        function loadEnd(tags) {
+            const container = document.getElementById('api-container');
+            const sidebarCategories = document.getElementById('sidebar-categories');
+
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            const entries = Object.entries(tags || {}).sort((a, b) => a[0].localeCompare(b[0]));
+
+            if (!entries.length) {
+                container.innerHTML = `
+                    <div class="bg-white border border-yellow-100 rounded-2xl p-4 shadow-soft text-yellow-700 font-bold text-xs leading-relaxed">
+                        <i class="fa-solid fa-circle-info mr-2"></i>Data endpoint kosong. Pastikan <code>/config</code> punya object <code>tags</code>.
+                    </div>`;
+                return;
+            }
+
+            if (sidebarCategories) {
+                const allBtn = `
+                    <button onclick="showAllCategories(this)" class="sidebar-category-btn active w-full flex items-center gap-3 bg-white border border-blue-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-600 hover:bg-fmn-blue hover:text-white transition-all">
+                        <i class="fa-solid fa-border-all text-[11px]"></i>
+                        <span class="truncate">Semua</span>
+                    </button>`;
+
+                const categoryBtns = entries.map((item, idx) => {
+                    const safeName = escapeHtml(item[0]);
+                    const sectionId = 'section-cat-' + idx;
+
+                    return `
+                        <button onclick="filterCategory('${sectionId}', this)" class="sidebar-category-btn w-full flex items-center gap-3 bg-white border border-blue-100 rounded-xl px-3 py-2 text-xs font-bold text-slate-600 hover:bg-fmn-blue hover:text-white transition-all">
+                            <i class="fa-solid fa-layer-group text-[11px]"></i>
+                            <span class="truncate">${safeName}</span>
+                        </button>`;
+                }).join('');
+
+                sidebarCategories.innerHTML = allBtn + categoryBtns;
+            }
+
+            entries.forEach(([cat, routes], catIndex) => {
+                const section = document.createElement('div');
+
+                section.id = 'section-cat-' + catIndex;
+                section.className = 'api-section w-full animate-softUp';
+                section.dataset.category = cat;
+
+                section.innerHTML = `
+                    <div class="category-header-main w-full bg-white border border-blue-100 rounded-2xl shadow-soft p-3 mb-2">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-2 min-w-0">
+                                <div class="w-9 h-9 bg-blue-50 text-fmn-blue rounded-xl flex items-center justify-center text-sm border border-blue-100 shrink-0">
+                                    <i class="fa-solid fa-layer-group"></i>
+                                </div>
+                                <div class="min-w-0">
+                                    <h2 class="text-sm font-bold tracking-wide text-fmn-dark truncate">${escapeHtml(cat)}</h2>
+                                    <p class="text-[10px] text-slate-400 font-bold truncate">${Array.isArray(routes) ? routes.length : 0} features</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="api-section-grid grid grid-cols-1 md:grid-cols-2 gap-2 mb-4 w-full"></div>`;
+
+                const grid = section.querySelector('.api-section-grid');
+                const list = Array.isArray(routes) ? routes : [];
+
+                list.forEach((route, idx) => {
+                    const id = catIndex + '-' + idx;
+
+                    const method = String(route.method || 'GET').toUpperCase();
+                    const rawEndpoint = String(route.endpoint || '/');
+
+                    // endpoint asli tetap dipakai buat execute/request/copy
+                    const endpoint = rawEndpoint;
+
+                    // display fitur pendek:
+                    // /api/ai/gpt => gpt
+                    // /api/brat => brat
+                    // /tools/image/brat => brat
+                    const featureName = getDisplayFeature(route.name || rawEndpoint);
+                    const endpointFeature = getDisplayFeature(rawEndpoint);
+
+                    const name = featureName === 'feature' ? endpointFeature : featureName;
+
+                    const methodColor = method === 'GET'
+                        ? 'bg-blue-500'
+                        : method === 'POST'
+                            ? 'bg-sky-500'
+                            : 'bg-red-500';
+
+                    let copyUrl = endpoint;
+
+                    if (method === 'GET' && Array.isArray(route.params) && route.params.length > 0) {
+                        copyUrl = endpoint + '?' + route.params.map(p => encodeURIComponent(p.name) + '=').join('&');
+                    }
+
+                    let inputs = '';
+
+                    if (Array.isArray(route.params) && route.params.length) {
+                        inputs = '<div class="params-box-mobile bg-fmn-bg p-3 border-y border-blue-100 grid gap-2 w-full animate-softUp">' +
+                            route.params.map(p => {
+                                const inputId = ('input-' + id + '-' + p.name).replace(/\s+/g, '-');
+                                const value = p.example || p.default || getExampleValue(p);
+                                const placeholder = p.example || p.default || p.description || getExampleValue(p);
+
+                                return `
+                                    <div class="min-w-0">
+                                        <label class="text-[9px] font-bold text-slate-500 uppercase tracking-wider mb-1 block">
+                                            ${escapeHtml(p.name)} ${p.required ? '<span class="text-red-400">*</span>' : ''}
+                                        </label>
+                                        <input type="text" id="${escapeHtml(inputId)}" data-param-name="${escapeHtml(p.name)}" placeholder="${escapeHtml(placeholder)}" value="${escapeHtml(value)}" class="w-full min-w-0 border border-blue-100 p-2 text-[11px] rounded-lg focus:border-fmn-blue focus:ring-1 focus:ring-fmn-blue focus:outline-none bg-white shadow-sm max-w-full transition-all">
+                                    </div>`;
+                            }).join('') + '</div>';
+                    }
+
+                    const card = document.createElement('div');
+
+                    card.className = 'api-card-wrapper w-full bg-white border border-blue-100 rounded-xl hover:border-fmn-blue transition-all duration-300 overflow-hidden shadow-sm hover:shadow-md';
+
+                    card.dataset.search = (
+                        name + ' ' +
+                        endpointFeature + ' ' +
+                        rawEndpoint + ' ' +
+                        cat
+                    ).toLowerCase();
+
+                    card.innerHTML = `
+                        <div class="api-card-head p-2 cursor-pointer select-none hover:bg-fmn-bg transition-colors" onclick="toggleCard('${id}')">
+                            <div class="flex justify-between items-center gap-2">
+                                <div class="flex items-center gap-2 overflow-hidden min-w-0">
+                                    <span class="method-badge-mobile px-2 py-1 text-[9px] font-bold text-white ${methodColor} rounded-md font-mono tracking-wide w-12 text-center shadow-sm border border-black/10 shrink-0">${escapeHtml(method)}</span>
+                                    <div class="flex flex-col min-w-0">
+                                        <code class="font-bold text-[12px] sm:text-sm truncate font-mono text-slate-700 hover:text-fmn-dark transition-colors">${escapeHtml(name)}</code>
+                                        <span class="api-name-text text-[9px] text-slate-500 mt-0.5 font-bold truncate">${escapeHtml(method)} feature</span>
+                                    </div>
+                                </div>
+                                <i id="icon-${id}" class="fa-solid fa-plus text-[9px] text-slate-400 transition-transform duration-300 shrink-0"></i>
+                            </div>
+                        </div>
+
+                        <div id="body-${id}" class="hidden animate-softUp w-full">
+                            ${inputs}
+
+                            <div class="status-guide-wrap px-3 pt-3 hidden md:block">
+                                <div class="bg-white border border-blue-100 rounded-xl p-3 text-[11px] text-slate-600 leading-relaxed">
+                                    <div class="flex items-center gap-2 mb-2 text-fmn-dark font-bold">
+                                        <i class="fa-solid fa-circle-info"></i>
+                                        <span>HTTP Status Guide</span>
+                                    </div>
+                                    <div class="grid sm:grid-cols-2 gap-2">
+                                        <p>200 OK</p>
+                                        <p>400 Bad Request</p>
+                                        <p>401 Unauthorized</p>
+                                        <p>404 Not Found</p>
+                                        <p>500 Server Error</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="action-row-mobile p-3 flex gap-2 bg-white w-full items-center">
+                                <button id="btn-exec-${id}" onclick="testReq(this, '${escapeHtml(endpoint)}', '${escapeHtml(method)}', '${id}')" class="soft-btn variant-lavender flex-1 h-9 w-full">
+                                    <span class="soft-btn__wrapper">
+                                        <span class="soft-btn__content">
+                                            <span class="soft-btn__inner text-[10px] font-bold tracking-widest">
+                                                <i class="fa-solid fa-bolt"></i> EXECUTE
+                                            </span>
+                                        </span>
+                                    </span>
+                                </button>
+
+                                <button onclick="copyFullUrl('${escapeHtml(copyUrl)}')" class="copy-full-url-btn px-3 h-9 border border-blue-100 bg-white hover:bg-fmn-bg text-slate-600 rounded-lg transition-all shadow-sm hover:shadow-neon" title="Copy Full URL">
+                                    <i class="fa-regular fa-copy"></i>
+                                </button>
+                            </div>
+
+                            <div id="res-area-${id}" class="response-area response-clean-card hidden mx-3 mb-3 rounded-xl overflow-hidden bg-white relative max-w-[calc(100%-1.5rem)] border border-slate-200 shadow-sm">
+                                <div class="response-toolbar">
+                                    <div class="flex items-center gap-2 text-slate-700 font-bold text-[10px]">
+                                        <span class="w-7 h-7 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-center text-fmn-blue">
+                                            <i class="fa-solid fa-code"></i>
+                                        </span>
+                                        <span>Response</span>
+                                    </div>
+
+                                    <div class="response-meta">
+                                        <span id="status-indicator-${id}" class="status-indicator status-waiting"></span>
+                                        <span id="status-${id}" class="text-[9px] font-mono font-bold text-slate-500">IDLE</span>
+                                        <span id="time-${id}" class="text-[9px] font-mono text-slate-400">0ms</span>
+                                    </div>
+                                </div>
+
+                                <div class="response-action-grid px-3 pt-2 grid grid-cols-3 gap-2">
+                                    <button onclick="copyEndpoint('${escapeHtml(endpoint)}')" class="copy-mini-btn">
+                                        <i class="fa-regular fa-copy"></i> Endpoint
+                                    </button>
+                                    <button onclick="copyRequest('${escapeHtml(endpoint)}', '${escapeHtml(method)}', '${id}')" class="copy-mini-btn">
+                                        <i class="fa-solid fa-terminal"></i> Request
+                                    </button>
+                                    <button onclick="copyRes('${id}')" class="copy-mini-btn">
+                                        <i class="fa-regular fa-clone"></i> Result
+                                    </button>
+                                </div>
+
+                                <div class="request-url-box">
+                                    <div class="label">
+                                        <i class="fa-solid fa-link"></i>
+                                        <span>Request URL</span>
+                                    </div>
+                                    <code id="request-line-${id}">curl -X ${escapeHtml(method)} ${escapeHtml(endpoint)}</code>
+                                </div>
+
+                                <div class="response-output-box custom-scrollbar font-mono text-[10px]">
+                                    <div id="output-${id}" class="text-slate-700 break-all whitespace-pre-wrap leading-relaxed"></div>
+                                </div>
+                            </div>
+                        </div>`;
+
+                    grid.appendChild(card);
+                });
+
+                container.appendChild(section);
+            });
+
+            initSoftButtons();
+        }
+
+        function initSoftButtons() {
+            document.querySelectorAll('.soft-btn').forEach(btn => {
+                btn.addEventListener('pointerdown', () => btn.classList.add('soft-btn--active'));
+
+                ['pointerup', 'pointerleave', 'pointercancel'].forEach(evt => {
+                    btn.addEventListener(evt, () => btn.classList.remove('soft-btn--active'));
+                });
+            });
+        }
+
+        function setActiveSidebarCategory(btn) {
+            document.querySelectorAll('.sidebar-category-btn').forEach(el => el.classList.remove('active'));
+
+            if (btn) {
+                btn.classList.add('active');
+            }
+        }
+
+        function showAllCategories(btn) {
+            activeCategoryId = 'all';
+
+            setActiveSidebarCategory(btn);
+
+            document.querySelectorAll('.api-section').forEach(section => section.classList.remove('hidden'));
+
+            const input = document.getElementById('search-input');
+
+            if (input) {
+                input.value = '';
+            }
+
+            hideNoResults();
+            closeSidebar();
+        }
+
+        function filterCategory(sectionId, btn) {
+            activeCategoryId = sectionId;
+
+            setActiveSidebarCategory(btn);
+
+            document.querySelectorAll('.api-section').forEach(section => {
+                section.classList.toggle('hidden', section.id !== sectionId);
+            });
+
+            const input = document.getElementById('search-input');
+
+            if (input) {
+                input.value = '';
+            }
+
+            hideNoResults();
+            closeSidebar();
+
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function toggleCard(id) {
+            const body = document.getElementById('body-' + id);
+            const icon = document.getElementById('icon-' + id);
+
+            if (!body || !icon) return;
+
+            const isHidden = body.classList.contains('hidden');
+
+            body.classList.toggle('hidden', !isHidden);
+            icon.classList.toggle('fa-plus', !isHidden);
+            icon.classList.toggle('fa-minus', isHidden);
+            icon.classList.toggle('text-fmn-blue', isHidden);
+            icon.classList.toggle('rotate-180', isHidden);
+        }
+
+        function hideNoResults() {
+            const noResults = document.getElementById('no-results');
+
+            if (!noResults) return;
+
+            noResults.classList.add('hidden');
+            noResults.classList.remove('flex');
+        }
+
+        function showNoResults() {
+            const noResults = document.getElementById('no-results');
+
+            if (!noResults) return;
+
+            noResults.classList.remove('hidden');
+            noResults.classList.add('flex');
+        }
+
+        function setSearch() {
+            const input = document.getElementById('search-input');
+
+            if (!input) return;
+
+            input.addEventListener('input', e => {
+                const val = e.target.value.toLowerCase().trim();
+
+                let anyVisible = false;
+
+                document.querySelectorAll('.api-section').forEach(section => {
+                    const allowedByCategory = activeCategoryId === 'all' || section.id === activeCategoryId;
+
+                    let matchCount = 0;
+
+                    section.querySelectorAll('.api-card-wrapper').forEach(card => {
+                        const match = !val || card.dataset.search.includes(val);
+
+                        card.classList.toggle('hidden', !match);
+
+                        if (match) {
+                            matchCount++;
+                        }
+                    });
+
+                    const sectionVisible = allowedByCategory && matchCount > 0;
+
+                    section.classList.toggle('hidden', !sectionVisible);
+
+                    if (sectionVisible) {
+                        anyVisible = true;
+                    }
+                });
+
+                if (anyVisible) {
+                    hideNoResults();
+                } else {
+                    showNoResults();
+                }
+            });
+        }
+
+        function messeg(msg) {
+            const toast = document.getElementById('custom-toast');
+            const msgBox = document.getElementById('toast-message');
+
+            if (!toast || !msgBox) return;
+
+            msgBox.innerText = msg;
+
+            toast.classList.remove('translate-y-32', 'opacity-0');
+
+            if (toastTimeout) {
+                clearTimeout(toastTimeout);
+            }
+
+            toastTimeout = setTimeout(() => {
+                toast.classList.add('translate-y-32', 'opacity-0');
+            }, 2500);
+        }
+
+        function copyFullUrl(path) {
+            navigator.clipboard.writeText(window.location.origin + path);
+            messeg('URL COPIED');
+        }
+
+        function copyEndpoint(endpoint) {
+            navigator.clipboard.writeText(endpoint);
+            messeg('ENDPOINT COPIED');
+        }
+
+        function copyRequest(endpoint, method, id) {
+            const line = document.getElementById('request-line-' + id);
+
+            navigator.clipboard.writeText(
+                line?.innerText || ('curl -X ' + method + ' ' + window.location.origin + endpoint)
+            );
+
+            messeg('REQUEST COPIED');
+        }
+
+        function copyRes(id) {
+            const out = document.getElementById('output-' + id);
+
+            if (out?.innerText) {
+                navigator.clipboard.writeText(out.innerText);
+                messeg('RESPONSE COPIED');
+            }
+        }
+
+        function cleanErrorBody(serverMessage) {
+            let raw = String(serverMessage || '').trim();
+
+            if (!raw) return '';
+
+            const lower = raw.toLowerCase();
+
+            const isHtmlOrCss =
+                lower.includes('<!doctype html') ||
+                lower.includes('<html') ||
+                lower.includes('<head') ||
+                lower.includes('<body') ||
+                lower.includes('<style') ||
+                lower.includes('body, html') ||
+                lower.includes('background-color') ||
+                lower.includes('display: flex') ||
+                lower.includes('justify-content') ||
+                lower.includes('align-items') ||
+                lower.includes('margin: 0') ||
+                lower.includes('padding: 0');
+
+            if (isHtmlOrCss) return '';
+
+            try {
+                const parsed = JSON.parse(raw);
+
+                if (parsed && typeof parsed === 'object') {
+                    return String(
+                        parsed.error ||
+                        parsed.message ||
+                        parsed.msg ||
+                        parsed.reason ||
+                        ''
+                    ).trim().slice(0, 120);
+                }
+            } catch (e) {}
+
+            raw = raw
+                .split('\n').join(' ')
+                .split('\r').join(' ')
+                .split('\t').join(' ');
+
+            while (raw.includes('  ')) {
+                raw = raw.split('  ').join(' ');
+            }
+
+            return raw.trim().slice(0, 120);
+        }
+
+        function getErrorMessage(code, statusText, serverMessage) {
+            const serverText = cleanErrorBody(serverMessage);
+
+            const messages = {
+                400: '400 Bad Request - Input atau parameter salah.',
+                401: '401 Unauthorized - API key/token salah atau belum dikirim.',
+                403: '403 Forbidden - Akses endpoint ditolak.',
+                404: '404 Not Found - Endpoint atau URL salah.',
+                408: '408 Timeout - Server terlalu lama merespons.',
+                415: '415 Unsupported Media Type - Format request salah.',
+                422: '422 Validation Error - Format input tidak sesuai.',
+                429: '429 Too Many Requests - Terlalu banyak request.',
+                500: '500 Server Error - Server error atau input membuat proses gagal.',
+                502: '502 Bad Gateway - Server tujuan bermasalah.',
+                503: '503 Service Unavailable - Server sedang mati atau maintenance.',
+                504: '504 Gateway Timeout - Server tujuan terlalu lama merespons.',
+                505: '505 HTTP Version Not Supported - Versi HTTP tidak didukung.'
+            };
+
+            if (serverText) return serverText;
+
+            if (code === 'NETWORK') {
+                return 'Network Error - Gagal terhubung ke server.';
+            }
+
+            return messages[Number(code)] || (
+                String(code) + ' ' + (statusText || 'Request Failed') + ' - Request gagal diproses.'
+            );
+        }
+
+        function normalizeApiResponse(data, isSuccess, responseTime) {
+            if (data && typeof data === 'object' && !Array.isArray(data)) {
+                const cloned = { ...data };
+
+                delete cloned.author;
+                delete cloned.creator;
+                delete cloned.timestamp;
+                delete cloned.response_time;
+
+                return {
+                    status: typeof data.status === 'undefined' ? isSuccess : data.status,
+                    creator: 'Barikzz',
+                    ...cloned,
+                    timestamp: new Date().toISOString(),
+                    response_time: responseTime + 'ms'
+                };
+            }
+
+            return {
+                status: isSuccess,
+                creator: 'Barikzz',
+                result: data,
+                timestamp: new Date().toISOString(),
+                response_time: responseTime + 'ms'
+            };
+        }
+
+        function renderCleanError(code, statusText, serverMessage, responseTime) {
+            return syntaxHighlight({
+                status: false,
+                creator: 'Barikzz',
+                error: getErrorMessage(code, statusText, serverMessage),
+                timestamp: new Date().toISOString(),
+                response_time: responseTime + 'ms'
+            });
+        }
+
+        async function testReq(btn, url, method, id) {
+            if (btn.disabled) return;
+
+            const out = document.getElementById('output-' + id);
+            const status = document.getElementById('status-' + id);
+            const time = document.getElementById('time-' + id);
+            const resArea = document.getElementById('res-area-' + id);
+            const statusIndicator = document.getElementById('status-indicator-' + id);
+
+            if (!out || !status || !time || !resArea || !statusIndicator) return;
+
+            const btnInner = btn.querySelector('.soft-btn__inner');
+            const originalBtnText = btnInner.innerHTML;
+
+            btn.disabled = true;
+            btnInner.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> PROCESSING';
+
+            resArea.classList.remove('hidden', 'success', 'error');
+            statusIndicator.className = 'status-indicator status-waiting';
+            status.innerText = 'RUNNING...';
+            status.className = 'text-[9px] font-mono font-bold text-blue-500';
+
+            out.innerHTML = `
+                <div class="flex items-center gap-2 text-slate-600 font-bold">
+                    <span class="w-7 h-7 rounded-full bg-blue-50 text-fmn-blue flex items-center justify-center">
+                        <i class="fa-solid fa-circle-notch fa-spin"></i>
+                    </span>
+                    <span>Processing...</span>
+                </div>`;
+
+            const params = {};
+
+            document.querySelectorAll('[id^="input-' + id + '-"]').forEach(input => {
+                if (input.value) {
+                    params[input.dataset.paramName || input.id.split('input-' + id + '-')[1]] = input.value;
+                }
+            });
+
+            const fetchUrl = url + (
+                method === 'GET' && Object.keys(params).length
+                    ? '?' + new URLSearchParams(params)
+                    : ''
+            );
+
+            const fullRequestUrl = window.location.origin + fetchUrl;
+            const requestLine = document.getElementById('request-line-' + id);
+
+            if (requestLine) {
+                requestLine.innerText = method === 'GET'
+                    ? 'curl -X GET "' + fullRequestUrl + '"'
+                    : 'curl -X ' + method + ' "' + window.location.origin + url + '" -H "Content-Type: application/json" -d ' + JSON.stringify(JSON.stringify(params));
+            }
+
+            const opts = {
+                method: method,
+                ...(method !== 'GET'
+                    ? {
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(params)
+                    }
+                    : {})
+            };
+
+            const start = Date.now();
+
+            try {
+                const req = await fetch(fetchUrl, opts);
+                const duration = Date.now() - start;
+
+                time.innerText = duration + 'ms';
+
+                if (req.ok) {
+                    statusIndicator.className = 'status-indicator status-success';
+                    status.innerText = req.status + ' ' + req.statusText;
+                    status.className = 'text-[9px] font-mono font-bold text-green-500';
+                    resArea.classList.add('success');
+                } else {
+                    statusIndicator.className = 'status-indicator status-error';
+                    status.innerText = req.status + ' ' + req.statusText;
+                    status.className = 'text-[9px] font-mono font-bold text-red-500';
+                    resArea.classList.add('error');
+                }
+
+                const type = req.headers.get('content-type') || '';
+
+                if (!req.ok) {
+                    let errorBody = '';
+
+                    try {
+                        errorBody = type.includes('json')
+                            ? JSON.stringify(await req.json())
+                            : await req.text();
+                    } catch (e) {}
+
+                    out.innerHTML = renderCleanError(req.status, req.statusText, errorBody, duration);
+                    return;
+                }
+
+                if (type.includes('json')) {
+                    const json = normalizeApiResponse(await req.json(), true, duration);
+                    out.innerHTML = syntaxHighlight(json);
+                } else if (type.startsWith('image')) {
+                    const blob = await req.blob();
+                    const imageUrl = URL.createObjectURL(blob);
+
+                    out.innerHTML = `
+                        <div class="flex justify-center p-2">
+                            <img src="${imageUrl}" class="max-w-full rounded border border-blue-100 max-h-[240px]">
+                        </div>`;
+                } else {
+                    const text = await req.text();
+                    out.innerHTML = escapeHtml(text);
+                }
+            } catch (err) {
+                const duration = Date.now() - start;
+
+                time.innerText = duration + 'ms';
+                statusIndicator.className = 'status-indicator status-error';
+                status.innerText = 'ERROR';
+                status.className = 'text-[9px] font-mono font-bold text-red-500';
+                resArea.classList.add('error');
+
+                out.innerHTML = renderCleanError('NETWORK', err.message, '', duration);
+            } finally {
+                btn.disabled = false;
+                btnInner.innerHTML = originalBtnText;
+            }
+        }
+
+        function syntaxHighlight(json) {
+            if (typeof json !== 'string') {
+                json = JSON.stringify(json, null, 2);
+            }
+
+            json = escapeHtml(json);
+
+            return json.replace(
+                /(&quot;(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\&])*&quot;(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+                function(match) {
+                    let cls = 'json-number';
+
+                    if (match.startsWith('&quot;')) {
+                        cls = match.endsWith(':') ? 'json-key' : 'json-string';
+                    } else if (match === 'true' || match === 'false') {
+                        cls = 'json-boolean';
+                    } else if (match === 'null') {
+                        cls = 'json-null';
+                    }
+
+                    return '<span class="' + cls + '">' + match + '</span>';
+                }
+            );
+        }
+    </script>
+</body>
+</html>
